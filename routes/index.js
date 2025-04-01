@@ -5,7 +5,7 @@ const {
   getUserProfile,
   updateUserProfile,
 } = require("../controllers/userController");
-const { bookAppointment, getAppointments, cancelAppointment } = require("../controllers/appointmentController"); 
+const { bookAppointment, getAppointments, cancelAppointment,getAvailableSlots } = require("../controllers/appointmentController"); 
 const { protect } = require("../middlewares/authMiddleware");
 const { addDentist, getDentists } = require("../controllers/dentistController");
 
@@ -21,7 +21,9 @@ router.put("/user/profile", protect, updateUserProfile);
 router.post("/appointments", protect, bookAppointment);
 router.get("/appointments", protect, getAppointments); 
 router.put("/appointments/cancel/:appointmentId", cancelAppointment);
-// Dentist
+router.get("/appointments/slots/:dentistId", getAvailableSlots);
+
+
 router.post("/dentists", addDentist); 
 router.get("/dentists", getDentists); 
 
