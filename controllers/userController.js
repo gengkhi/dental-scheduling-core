@@ -50,24 +50,40 @@ const loginUser = async (req, res) => {
     res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.INTERNAL_ERROR });
   }
 };
-
-//FOR PROFILE MANAGEMENT 
 // Get User Profile
 const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+
+    if (!user) {
+      return res.status(statusCodes.NOT_FOUND).json({ message: messages.USER_NOT_FOUND });
+    }
+
+    res.status(statusCodes.SUCCESS).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    });
+  } catch (error) {
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.INTERNAL_ERROR });
+  }
+};
+
+//FOR PROFILE MANAGEMENT 
+
+  const getUserId = async (req, res) => {
     try {
-      const user = await User.findById(req.user.userId);
+      const { email } = req.body; 
+      const user = await User.findOne({ email });
   
       if (!user) {
-        return res.status(statusCodes.NOT_FOUND).json({ message: messages.USER_NOT_FOUND });
+        return res.status(404).json({ message: "User not found" });
       }
   
-      res.status(statusCodes.SUCCESS).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      });
+      res.status(200).json({ userId: user._id });
     } catch (error) {
-      res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.INTERNAL_ERROR });
+      console.error("Error fetching user ID:", error);
+      res.status(500).json({ message: "Server error" });
     }
   };
   
@@ -100,4 +116,4 @@ const getUserProfile = async (req, res) => {
     }
   };
   
-  module.exports = { registerUser, loginUser, getUserProfile, updateUserProfile };
+  module.exports = { registerUser, loginUser, getUserProfile, updateUserProfile, getUserId };

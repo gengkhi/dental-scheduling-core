@@ -4,6 +4,7 @@ const {
   loginUser,
   getUserProfile,
   updateUserProfile,
+  getUserId
 } = require("../controllers/userController");
 const { bookAppointment, getAppointments, cancelAppointment,getAvailableSlots } = require("../controllers/appointmentController"); 
 const { protect } = require("../middlewares/authMiddleware");
@@ -14,12 +15,14 @@ const router = express.Router();
 // Authentication Routes
 router.post("/auth/register", registerUser);
 router.post("/auth/login", loginUser);
+router.post("/getUserId", getUserId);
+
 // User Profile Routes
 router.get("/user/profile", protect, getUserProfile);
 router.put("/user/profile", protect, updateUserProfile);
 //apppointments
 router.post("/appointments", protect, bookAppointment);
-router.get("/appointments", protect, getAppointments); 
+router.post("/appointments", protect, getAppointments); 
 router.put("/appointments/cancel/:appointmentId", cancelAppointment);
 router.get("/appointments/slots/:dentistId", getAvailableSlots);
 
