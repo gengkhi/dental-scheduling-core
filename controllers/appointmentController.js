@@ -1,5 +1,7 @@
 const Appointment = require("../models/AppointedModel");
+const mongoose = require("mongoose");
 
+// Book an appointment
 const bookAppointment = async (req, res) => {
   try {
     const { patient, dentist, date, email } = req.body;
@@ -26,10 +28,16 @@ const bookAppointment = async (req, res) => {
   }
 };
 
-// Get all appointments for a user
+// Get all appointments for a user (using patientId as a URL parameter)
 const getAppointments = async (req, res) => {
   try {
     const { patientId } = req.params;
+
+    // Ensure valid ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({ message: "Invalid patient ID" });
+    }
+
     const appointments = await Appointment.find({ patient: patientId }).populate("dentist");
 
     res.status(200).json(appointments);

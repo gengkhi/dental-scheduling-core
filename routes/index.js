@@ -22,8 +22,8 @@ router.get("/user/profile", protect, getUserProfile);
 router.put("/user/profile", protect, updateUserProfile);
 //apppointments
 router.post("/appointments", protect, bookAppointment);
-router.post("/appointments", protect, getAppointments); 
-router.put("/appointments/cancel/:appointmentId", cancelAppointment);
+router.get("/appointments/:patientId", getAppointments); 
+router.delete("/cancel/:appointmentId", cancelAppointment);
 router.get("/appointments/slots/:dentistId", getAvailableSlots);
 
 
