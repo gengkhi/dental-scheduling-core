@@ -6,11 +6,18 @@ const cors = require("cors");
 const routes = require("./routes");
 
 const app = express();
+
+const corsOptions = {
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"], 
+  credentials: true, 
+};
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors(corsOptions)); 
 
-// Connect Database
 connectDB();
 
 app.use("/api", routes);

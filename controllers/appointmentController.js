@@ -2,12 +2,10 @@ const Appointment = require("../models/AppointedModel");
 const STATUS_CODES = require("../utils/statusCode");
 const MESSAGES = require("../utils/messages");
 
-// Book an appointment
 const bookAppointment = async (req, res) => {
     try {
       const { patient, dentist, date } = req.body;
   
-      // Check if the dentist is available at the selected time
       const existingAppointment = await Appointment.findOne({ dentist, date });
       if (existingAppointment) {
         return res.status(STATUS_CODES.BAD_REQUEST).json({
