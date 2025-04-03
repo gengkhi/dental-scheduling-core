@@ -4,6 +4,7 @@ const {
   loginUser,
   getUserProfile,
   updateUserProfile,
+  changeUserPassword,
   getUserId
 } = require("../controllers/userController");
 const { bookAppointment, getAppointments, cancelAppointment,getAvailableSlots } = require("../controllers/appointmentController"); 
@@ -18,8 +19,10 @@ router.post("/auth/login", loginUser);
 router.post("/getUserId", getUserId);
 
 // User Profile Routes
-router.get("/user/profile", protect, getUserProfile);
+router.get("/user/get/profile", protect, getUserProfile);
 router.put("/user/profile", protect, updateUserProfile);
+router.put("/password", protect, changeUserPassword);
+
 //apppointments
 router.post("/appointments", protect, bookAppointment);
 router.get("/appointments/:patientId", getAppointments); 

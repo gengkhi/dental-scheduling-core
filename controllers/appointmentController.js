@@ -28,12 +28,11 @@ const bookAppointment = async (req, res) => {
   }
 };
 
-// Get all appointments for a user (using patientId as a URL parameter)
+// Get all appointments for a user
 const getAppointments = async (req, res) => {
   try {
     const { patientId } = req.params;
 
-    // Ensure valid ObjectId format
     if (!mongoose.Types.ObjectId.isValid(patientId)) {
       return res.status(400).json({ message: "Invalid patient ID" });
     }
@@ -53,14 +52,20 @@ const getAppointments = async (req, res) => {
 const getAvailableSlots = async (req, res) => {
   try {
     const { dentistId } = req.params;
+
+    // Predefined time slots
     const allSlots = [
       "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
       "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM",
     ];
 
     const existingAppointments = await Appointment.find({ dentist: dentistId });
+    const bookedSlots = existingAppointments.map(appt => {
+      const appointmentTime = new Date(appt.date).toLocaleString("en-US", { hour: '2-digit', minute: '2-digit', hour12: true });
+      return appointmentTime;
+    });
 
-    const bookedSlots = existingAppointments.map(appt => appt.date);
+    // Filter out the booked slots from the predefined list of all slots
     const availableSlots = allSlots.filter(slot => !bookedSlots.includes(slot));
 
     res.status(200).json(availableSlots);
@@ -71,6 +76,7 @@ const getAvailableSlots = async (req, res) => {
     });
   }
 };
+
 
 // Cancel appointment function
 const cancelAppointment = async (req, res) => {

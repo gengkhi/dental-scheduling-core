@@ -1,14 +1,13 @@
 const User = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs");  
 const statusCodes = require("../utils/statusCode");
 const messages = require("../utils/messages");
 
-// Generate Token
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
-// Register User
+
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -30,13 +29,14 @@ const registerUser = async (req, res) => {
   }
 };
 
-// Login User
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     const user = await User.findOne({ email });
 
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    // Check if user exists and if the entered password matches the stored hash
+    if (!user || !(await bcrypt.compare(password.trim(), user.password))) {
       return res.status(statusCodes.UNAUTHORIZED).json({ message: messages.INVALID_CREDENTIALS });
     }
 
@@ -46,11 +46,13 @@ const loginUser = async (req, res) => {
       email: user.email,
       token: generateToken(user._id),
     });
+
   } catch (error) {
     res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.INTERNAL_ERROR });
   }
 };
-// Get User Profile
+
+
 const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
@@ -115,5 +117,43 @@ const getUserProfile = async (req, res) => {
       res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.INTERNAL_ERROR });
     }
   };
+  //change password
+  const changeUserPassword = async (req, res) => {
+    try {
+      const { oldPassword, newPassword } = req.body;
   
-  module.exports = { registerUser, loginUser, getUserProfile, updateUserProfile, getUserId };
+      const user = await User.findById(req.user.userId);
+  
+      if (!user) {
+        return res.status(statusCodes.NOT_FOUND).json({ message: messages.USER_NOT_FOUND });
+      }
+  
+      const oldPasswordTrimmed = oldPassword.trim();
+      const newPasswordTrimmed = newPassword.trim();
+  
+  
+      const isMatch = await bcrypt.compare(oldPasswordTrimmed, user.password);
+  
+      if (!isMatch) {
+        return res.status(statusCodes.UNAUTHORIZED).json({ message: "Old password is incorrect" });
+      }
+  
+      if (newPasswordTrimmed) {
+        user.password = await bcrypt.hash(newPasswordTrimmed, 10);  
+        await user.save();
+  
+        res.status(statusCodes.SUCCESS).json({
+          message: "Password updated successfully",
+        });
+      } else {
+        return res.status(statusCodes.BAD_REQUEST).json({ message: "New password is required" });
+      }
+  
+    } catch (error) {
+      res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.INTERNAL_ERROR });
+    }
+  };
+  
+
+  
+  module.exports = { registerUser, loginUser, getUserProfile, updateUserProfile, getUserId , changeUserPassword}
