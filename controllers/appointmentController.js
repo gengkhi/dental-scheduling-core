@@ -48,49 +48,6 @@ const getAppointments = async (req, res) => {
   }
 };
 
-// const getAvailableSlots = async (req, res) => {
-//   try {
-//     const { dentistId } = req.params;  // Extract dentistId from params
-//     const { date } = req.query;  // Extract date from query parameters
-
-//     if (!dentistId || !date) {
-//       return res.status(400).json({ message: "Invalid parameters. Please provide both dentistId and date." });
-//     }
-
-//     console.log(`Fetching available slots for dentistId: ${dentistId}, date: ${date}`);
-
-//     const allSlots = [
-//       "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
-//       "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM",
-//     ];
-
-//     const startOfDay = new Date(date);
-//     startOfDay.setHours(0, 0, 0, 0);
-
-//     const endOfDay = new Date(date);
-//     endOfDay.setHours(23, 59, 59, 999);
-
-//     const existingAppointments = await Appointment.find({
-//       dentist: dentistId,
-//       date: { $gte: startOfDay, $lte: endOfDay },
-//     });
-
-//     const bookedSlots = existingAppointments.map(appt =>
-//       appt.date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })
-//     );
-
-//     const availableSlots = allSlots.map(slot => ({
-//       time: slot,
-//       available: !bookedSlots.includes(slot),
-//     }));
-
-//     res.status(200).json(availableSlots);
-//   } catch (error) {
-//     console.error("Error fetching available slots:", error);
-//     res.status(500).json({ message: error.message || "Server error" });
-//   }
-// };
-
 const getAvailableSlots = async (req, res) => {
   try {
     const { dentistId } = req.params; 
@@ -118,13 +75,12 @@ const getAvailableSlots = async (req, res) => {
       date: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    // Extract booked times and normalize them for comparison
     const bookedSlots = existingAppointments.map(appt => {
       return new Date(appt.date).toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true
-      }).replace(/^0/, '');  // Remove leading zero for consistency
+      }).replace(/^0/, ''); 
     });
 
     console.log("Booked Slots:", bookedSlots);  // Debugging
@@ -191,4 +147,3 @@ const updateAppointment = async (req, res) => {
 };
 
 module.exports = { bookAppointment, getAppointments, cancelAppointment, getAvailableSlots, updateAppointment };
-
