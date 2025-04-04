@@ -83,12 +83,10 @@ const getAvailableSlots = async (req, res) => {
       }).replace(/^0/, ''); 
     });
 
-    console.log("Booked Slots:", bookedSlots);  // Debugging
-
     // Remove booked slots from available slots
     const availableSlots = allSlots.map(slot => ({
       time: slot,
-      available: !bookedSlots.includes(slot.replace(/^0/, '')), // Normalize for comparison
+      available: !bookedSlots.includes(slot.replace(/^0/, '')),
     }));
 
     res.status(200).json(availableSlots);
